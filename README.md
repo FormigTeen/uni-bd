@@ -1,11 +1,8 @@
-# INSTITUTO DE COMPUTAÇÃO
-www.computacao.ufba.br  
 **MATA60 - Banco de Dados**  
 Prof. Robespierre Pita  
 robespierre.pita@ufba.br
 
 ## Trilha Prática
-(individual ou dupla)
 
 ### 1. Modelando a base de dados
 
@@ -99,3 +96,65 @@ Com base nos requisitos:
 2. Crie duas stored procedures.
 3. Crie duas transações.
 
+## Implementação
+
+1- Diagrama Inicial do Requisito:
+
+```mermaid
+
+erDiagram
+    tbl_produto {
+        int cp_id_produto PK
+        string nm_prod
+        string cd_ean_prod
+        int ce_rfid FK
+        int ce_categoria_principal FK
+        int ce_categoria_secundaria FK
+    }
+
+    tbl_rfid {
+        int cp_id_dispositivo PK
+        bool ind_venda_dispositivo
+    }
+
+    tbl_categoria {
+        int cp_cod_categoria PK
+        string nm_categoria
+    }
+
+    tbl_estabelecimento {
+        int cp_cod_estab PK
+        string nm_estab
+        string cnpj_estab
+        float[] localizacao_estab
+        string endereco_estab
+        string UF_estab
+        string cidade_estab
+    }
+
+    tbl_funcionario {
+        int cp_cod_func PK
+        string nm_func
+        string cpf_func
+        string funcao_func
+    }
+
+    tbl_fornecedor {
+        int cp_cod_forn PK
+        string cnpj_forn
+        float[] localizacao_forn
+        string endereco_forn
+        string UF_forn
+        string cidade_forn
+    }
+
+    %% Relacionamentos
+    tbl_produto ||--o{ tbl_rfid : "possui"
+    tbl_produto ||--o{ tbl_categoria : "categoria principal"
+    tbl_produto ||--o{ tbl_categoria : "categoria secundária"
+    tbl_produto ||--o{ tbl_estabelecimento : "distribuído em"
+    tbl_produto ||--o{ tbl_fornecedor : "fornecido por"
+
+    tbl_estabelecimento ||--o{ tbl_funcionario : "reposições feitas por"
+
+```
