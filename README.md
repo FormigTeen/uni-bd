@@ -157,7 +157,7 @@ Como cada ordem de compra de um produto por fornecedor devem conter informaçõe
 
 ---
 
-Como o sistema deve ter informações individuais por produto, então vale a criação de uma distinção de uma classe de itens ( produtos ) e os itens ( um elemento do grupo de produtos ). Além disso, deverá tratar as transferências dos itens de forma rastreavél. Segue as adaptações e adições necessárias: 
+Como o sistema deve ter informações individuais por produto, então vale a criação de uma distinção de uma classe de itens ( produtos ) e os itens ( um elemento do grupo de produtos ). Além disso, deverá tratar as transferências dos itens de forma rastreável. Segue as adaptações e adições necessárias: 
 
 - **tbl_produto:** tabela que concentra informações gerais sobre os produtos que compõem o acervo da empresa. Cada produto pode ter múltiplos itens específicos (unidades individuais).
   - `cp_id_produto [int, incremental]`: código identificador do produto. Único e incremental.
