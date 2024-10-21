@@ -138,80 +138,58 @@ Com base na descrição do Sistema de Informação:
 3. Crie o SQL DDL do banco modelado.
 4. Popule as tabelas com pelo menos 200 registros.
 
-### Trilha prática 2
 
-Com base nos requisitos:
-1. Produza 20 queries básicas, 15 intermediárias e 10 avançadas.
-2. Execute 50 vezes essas queries, registrando o tempo de execução.
-3. Elabore um plano de indexação, execute as queries novamente e registre o speedup.
-4. Elabore um plano de tuning, execute as queries novamente e registre o speedup.
+#### Elaboração
 
-### Trilha prática 3
+Abaixo segue a descrição e motivação da Tabela e sua formação inicial:
 
-Com base nos requisitos:
-1. Crie duas views.
-2. Crie duas stored procedures.
-3. Crie duas transações.
+---
+Como cada ordem de compra de um produto por fornecedor devem conter informações adicionais e é uma relação de **P x F**, deve existir uma tabela auxiliar para persistir essas relações e seus dados auxiliares.
 
-## Implementação
+- **tbl_ordem_compra:** tabela que concentra informações sobre as ordens de compra, relacionando produtos e fornecedores, bem como os detalhes da transação.
+  - `cp_id_ordem [int, incremental]`: código identificador da ordem de compra. Único e incremental.
+  - `ce_produto [int, 8 bytes]`: chave estrangeira que define o produto relacionado à ordem de compra. Refere-se ao `cp_id_produto` da **tbl_produto**.
+  - `ce_fornecedor [int, 8 bytes]`: chave estrangeira que define o fornecedor relacionado à ordem de compra. Refere-se ao `cp_cod_forn` da **tbl_fornecedor**.
+  - `dt_venda [date]`: data da venda do produto, indicando quando a transação foi realizada.
+  - `dt_vencimento [date]`: data de vencimento do pagamento da ordem de compra.
+  - `preco_por_quantidade [float, 10,2]`: preço total considerando a quantidade de produtos comprados, com até duas casas decimais.
+  - `quantidade [int, 8 bytes]`: quantidade de produtos comprados nesta ordem de compra.
 
-1- Diagrama Inicial do Requisito:
+---
 
-```mermaid
+Como o sistema deve ter informações individuais por produto, então vale a criação de uma distinção de uma classe de itens ( produtos ) e os itens ( um elemento do grupo de produtos ). Além disso, deverá tratar as transferências dos itens de forma rastreavél. Segue as adaptações e adições necessárias: 
 
-erDiagram
-    tbl_produto {
-        int cp_id_produto PK
-        string nm_prod
-        string cd_ean_prod
-        int ce_rfid FK
-        int ce_categoria_principal FK
-        int ce_categoria_secundaria FK
-    }
+- **tbl_produto:** tabela que concentra informações gerais sobre os produtos que compõem o acervo da empresa. Cada produto pode ter múltiplos itens específicos (unidades individuais).
+  - `cp_id_produto [int, incremental]`: código identificador do produto. Único e incremental.
+  - `nm_prod [str, 60 caracteres]`: nome do produto, conforme normas técnicas para integração em notas fiscais (Norma Técnica 2021.004 – v.133).
+  - `cd_ean_prod [str, 12 caracteres]`: código de barras do produto, conforme padrão EAN.
+  - `ce_categoria_principal [int, 8 bytes]`: chave estrangeira que define a categoria principal do produto.
+  - `ce_categoria_secundaria [int, 8 bytes]`: chave estrangeira que define a categoria secundária do produto.
 
-    tbl_rfid {
-        int cp_id_dispositivo PK
-        bool ind_venda_dispositivo
-    }
+- **tbl_item:** tabela que concentra informações sobre os itens individuais relacionados aos produtos (unidades individuais no estoque). Cada item pertence a um produto da tabela **tbl_produto**.
+  - `cp_id_item [int, incremental]`: código identificador do item individual. Único e incremental.
+  - `ce_produto [int, 8 bytes]`: chave estrangeira que define o produto ao qual o item pertence. Refere-se ao `cp_id_produto` da **tbl_produto**.
+  - `ce_rfid [int, 8 bytes]`: chave estrangeira que define o rfid do item. Refere-se ao `cp_id_dispositivo` da **tbl_rfid**.
+  - `ce_lote_venda [int, 8 bytes]`: chave estrangeira que define o lote de venda ao qual o item pertence. Refere-se ao `cp_id_ordem` da **tbl_ordem_compra**.
+  - `ce_ultima_transacao [int, 8 bytes]`: chave estrangeira que define a última transação feita para o item. Refere-se ao `cp_id_transacao` da **tbl_transacao**.
 
-    tbl_categoria {
-        int cp_cod_categoria PK
-        string nm_categoria
-    }
+- **tbl_transacao:** tabela que concentra informações sobre as transações realizadas para os itens individuais. Isso inclui compras, transferências e vendas.
+  - `cp_id_transacao [int, incremental]`: código identificador da transação. Único e incremental.
+  - `ce_item [int, 8 bytes]`: chave estrangeira que define o item envolvido na transação. Refere-se ao `cp_id_item` da **tbl_item**.
+  - `dt_transacao [date]`: data em que a transação foi realizada.
+  - `tp_transacao [string, 20 caracteres]`: tipo da transação, podendo ser "compra", "transferencia" ou "venda".
+  - `ce_estab_origem [int, 8 bytes]`: chave estrangeira que define o estabelecimento de origem da transação. Refere-se ao `cp_cod_estab` da **tbl_estabelecimento**. Pode ser nulo (por exemplo, em uma compra).
+  - `ce_estab_destino [int, 8 bytes]`: chave estrangeira que define o estabelecimento de destino da transação. Refere-se ao `cp_cod_estab` da **tbl_estabelecimento**. Pode ser nulo (por exemplo, em uma venda).
 
-    tbl_estabelecimento {
-        int cp_cod_estab PK
-        string nm_estab
-        string cnpj_estab
-        float[] localizacao_estab
-        string endereco_estab
-        string UF_estab
-        string cidade_estab
-    }
 
-    tbl_funcionario {
-        int cp_cod_func PK
-        string nm_func
-        string cpf_func
-        string funcao_func
-    }
+---
 
-    tbl_fornecedor {
-        int cp_cod_forn PK
-        string cnpj_forn
-        float[] localizacao_forn
-        string endereco_forn
-        string UF_forn
-        string cidade_forn
-    }
+Para tornar o controle do estoque mais preciso, cabe a adequação de um requisito. No qual, o controle de estoque pelo estabelecimento será dado por produto ao invés de por cateoria. Segue abaixo a nova tabela:
 
-    %% Relacionamentos
-    tbl_produto ||--o{ tbl_rfid : "possui"
-    tbl_produto ||--o{ tbl_categoria : "categoria principal"
-    tbl_produto ||--o{ tbl_categoria : "categoria secundária"
-    tbl_produto ||--o{ tbl_estabelecimento : "distribuído em"
-    tbl_produto ||--o{ tbl_fornecedor : "fornecido por"
+- **tbl_estoque:** tabela que concentra informações sobre o controle de estoque de cada produto em cada estabelecimento, com limites mínimos e máximos de quantidade.
+  - `cp_id_estoque [int, incremental]`: código identificador do controle de estoque. Único e incremental.
+  - `ce_produto [int, 8 bytes]`: chave estrangeira que define o produto cujo estoque está sendo controlado. Refere-se ao `cp_id_produto` da **tbl_produto**.
+  - `ce_estabelecimento [int, 8 bytes]`: chave estrangeira que define o estabelecimento ao qual o estoque pertence. Refere-se ao `cp_cod_estab` da **tbl_estabelecimento**.
+  - `qtd_min_estoque [int, 8 bytes]`: quantidade mínima de estoque que deve ser mantida no estabelecimento para o produto.
+  - `qtd_max_estoque [int, 8 bytes]`: quantidade máxima de estoque permitida no estabelecimento para o produto.
 
-    tbl_estabelecimento ||--o{ tbl_funcionario : "reposições feitas por"
-
-```
