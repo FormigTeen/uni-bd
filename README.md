@@ -193,3 +193,15 @@ Para tornar o controle do estoque mais preciso, cabe a adequação de um requisi
   - `qtd_min_estoque [int, 8 bytes]`: quantidade mínima de estoque que deve ser mantida no estabelecimento para o produto.
   - `qtd_max_estoque [int, 8 bytes]`: quantidade máxima de estoque permitida no estabelecimento para o produto.
 
+
+##### Modelagem BR Modelo
+
+Em seguida seguem as modelagens:
+
+1. Modelagem Conceitual
+
+![Modelagem Conceitual](concept.png)
+
+1. Modelagem Lógica
+
+![Modelagem Lógica](logical.png)
