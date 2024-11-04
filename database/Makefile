@@ -3,10 +3,12 @@ CONTAINER_NAME=formigteen
 IMAGE_NAME=formigteen
 POSTGRES_PASSWORD=mysecretpassword
 
-# Target para rodar o container, iniciar o PostgreSQL e executar os scripts
+all: build start
+
 build:
 	podman build -t $(IMAGE_NAME) .
-start:
+
+start: build
 	podman run --name $(CONTAINER_NAME) \
 		-e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
 		-e POSTGRES_HOST_AUTH_METHOD=trust \
