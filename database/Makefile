@@ -15,6 +15,6 @@ start: build
 		--rm ${IMAGE_NAME}
 
 # Target para parar o container
-enter:
+connect:
 	podman exec -it ${CONTAINER_NAME} psql -U postgres -d postgres
 
