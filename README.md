@@ -168,10 +168,9 @@ Como o sistema deve ter informações individuais por produto, então vale a cri
 
 - **tbl_item:** tabela que concentra informações sobre os itens individuais relacionados aos produtos (unidades individuais no estoque). Cada item pertence a um produto da tabela **tbl_produto**.
   - `cp_id_item [int, incremental]`: código identificador do item individual. Único e incremental.
-  - `ce_produto [int, 8 bytes]`: chave estrangeira que define o produto ao qual o item pertence. Refere-se ao `cp_id_produto` da **tbl_produto**.
-  - `ce_rfid [int, 8 bytes]`: chave estrangeira que define o rfid do item. Refere-se ao `cp_id_dispositivo` da **tbl_rfid**.
   - `ce_lote_venda [int, 8 bytes]`: chave estrangeira que define o lote de venda ao qual o item pertence. Refere-se ao `cp_id_ordem` da **tbl_ordem_compra**.
-  - `ce_ultima_transacao [int, 8 bytes]`: chave estrangeira que define a última transação feita para o item. Refere-se ao `cp_id_transacao` da **tbl_transacao**.
+  - `code_rfid [str]`: código do dispositivo RFID
+  - `status [int, 8 bytes]`: status de venda do item
 
 - **tbl_transacao:** tabela que concentra informações sobre as transações realizadas para os itens individuais. Isso inclui compras, transferências e vendas.
   - `cp_id_transacao [int, incremental]`: código identificador da transação. Único e incremental.
@@ -179,7 +178,7 @@ Como o sistema deve ter informações individuais por produto, então vale a cri
   - `dt_transacao [date]`: data em que a transação foi realizada.
   - `tp_transacao [string, 20 caracteres]`: tipo da transação, podendo ser "compra", "transferencia" ou "venda".
   - `ce_estab_origem [int, 8 bytes]`: chave estrangeira que define o estabelecimento de origem da transação. Refere-se ao `cp_cod_estab` da **tbl_estabelecimento**. Pode ser nulo (por exemplo, em uma compra).
-  - `ce_estab_destino [int, 8 bytes]`: chave estrangeira que define o estabelecimento de destino da transação. Refere-se ao `cp_cod_estab` da **tbl_estabelecimento**. Pode ser nulo (por exemplo, em uma venda).
+  - `ce_funcionario [int, 8 bytes]`: chave estrangeira que define o funcionário que executará a transação
 
 
 ---
