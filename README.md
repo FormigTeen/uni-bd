@@ -2,6 +2,13 @@
 Prof. Robespierre Pita  
 robespierre.pita@ufba.br
 
+## Executando o Projeto
+
+1. O projeto necessita do Make e do Podman
+2. Entre na pasta databasae `cd database`
+3. Execute `make` para o Build e Seeding do Banco de Dados
+4. Exucte `make connect` para se Conectar ao Banco
+
 ## Trilha Prática
 
 ### 1. Modelando a base de dados
