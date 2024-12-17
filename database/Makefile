@@ -11,6 +11,7 @@ build:
 start: build
 	podman run --name $(CONTAINER_NAME) \
 		-e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		--network host \
 		-e POSTGRES_HOST_AUTH_METHOD=trust \
 		--rm ${IMAGE_NAME}
 
