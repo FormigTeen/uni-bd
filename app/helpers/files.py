@@ -2,10 +2,11 @@ import os
 import glob
 
 
-def get_sql_files(folder):
+def get_sql_files():
     base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    sql_files_path = os.path.join(base_path, "database", "queries", folder, "*.sql")
-    sql_files = glob.glob(sql_files_path)
+    queries_path = os.path.join(base_path, "database", "queries")
+    sql_files_path = os.path.join(queries_path, "**", "*.sql")
+    sql_files = glob.glob(sql_files_path, recursive=True)
     return sql_files
 
 

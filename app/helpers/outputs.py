@@ -12,22 +12,27 @@ def get_output_folder():
     return path
 
 
-def prepare_sheet(level, times = 1):
-    paths = get_sql_files(level)
-    headers = ["Arquivo", "Média"] + ["Exec #" + str(index + 1) for index in range(times)]
-    table = [headers]
+def get_headers(times = 1):
+    return ["Contexto", "Arquivo", "Média"] + ["Exec #" + str(index + 1) for index in range(times)]
+
+def prepare_sheet(times = 1):
+    paths = get_sql_files()
+    table = [get_headers(times)]
     for file_path in paths:
         query = read(file_path)
         file_name = basename(file_path)
+        folder_name = os.path.basename(os.path.dirname(file_path))
+        print("Gerando resultados para " + file_name)
         results = [get_execution(tune(query)) for _ in range(times)]
         table.append([
-            file_name, mean(results), *results,
+            folder_name.capitalize(), file_name, mean(results), *results,
         ])
+        print("Resultados gerado!")
     return table
 
-def generate_sheet(level, times = 1):
-    file_path = os.path.join(get_output_folder(), str(level) + ".ods")
-    lines = prepare_sheet(level, times)
+def generate_sheet(times = 1):
+    file_path = os.path.join(get_output_folder(), "result.ods")
+    lines = prepare_sheet(times)
     header, *lines = lines
     df = pd.DataFrame(lines, columns=header)
     df.to_excel(file_path, engine="odf", index=False, header=True)
