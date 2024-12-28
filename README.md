@@ -271,13 +271,13 @@ O schema final introduziu melhorias na estrutura do banco, com foco em:
 
 Os dados agregados podem ser consultados diretamente na [planilha disponibilizada](https://docs.google.com/spreadsheets/d/1oazARfbI_yA5pa_RHgOJ9OIRChtanrrmdRs7X-7Q1Z8). Como demonstrado, algumas queries apresentaram perdas de performance com diferenças mínimas em suas médias. No entanto, o saldo geral do projeto é **positivo**, resultando em uma melhora significativa na performance acumulada.
 
-- O tempo total de execução obtido como ganho geral foi de **74,53634 segundos**, considerando a soma das médias.
+- O tempo total de execução obtido como ganho geral foi de **74,53634 ms**, considerando a soma das médias.
 - Observa-se que a maior piora ocorreu nas queries:
   - **transactions.sql**
   - **missed_products.sql**  
-  Ambas têm como característica comum o alto volume de operações na tabela **transactions**, o que contribuiu para uma média geral de **10 segundos** de piora.
+  Ambas têm como característica comum o alto volume de operações na tabela **transactions**, o que contribuiu para uma média geral de **10 ms** de piora.
 
 - Por outro lado, a maior melhora absoluta foi observada na query **transactions_most_items.sql**.
 ---
 
-- **Queries com piora menor que 0,01s:** Apesar de estarem marcadas como "Piora", as diferenças são insignificantes para o uso em produção.
+- **Queries com piora menor que 0,01ms:** Apesar de estarem marcadas como "Piora", as diferenças são insignificantes para o uso em produção.
