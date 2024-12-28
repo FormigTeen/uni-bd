@@ -30,10 +30,10 @@ def prepare_sheet(times = 1):
         print("Resultados gerado!")
     return table
 
-def generate_sheet(times = 1):
-    file_path = os.path.join(get_output_folder(), "result.ods")
+def generate_sheet(times=1):
+    file_path = os.path.join(get_output_folder(), "result.csv")
     lines = prepare_sheet(times)
     header, *lines = lines
     df = pd.DataFrame(lines, columns=header)
-    df.to_excel(file_path, engine="odf", index=False, header=True)
+    df.to_csv(file_path, index=False, header=True, sep=',', decimal=',')
     return True
