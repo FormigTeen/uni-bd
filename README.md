@@ -211,3 +211,60 @@ Em seguida seguem as modelagens:
 1. Modelagem Lógica
 
 ![Modelagem Lógica](logical.png)
+
+### Tuning e Indexação
+
+Na elaboração do projeto, foram criados **dois schemas** distintos: o **inicial** e o **final**, com a evolução entre eles para buacar melhorias significativas em performance e consistência dos dados.  
+
+---
+
+#### **Schema Inicial**
+O schema inicial representava uma **modelagem básica** das tabelas de um sistema de logística de alimentos, sem otimizações. Algumas características do schema inicial incluem:
+
+- **Falta de indexação:** As tabelas não possuíam índices para acelerar consultas frequentes.
+- **Ausência de constraints únicos:** Não havia garantias de unicidade para colunas, como:
+  - `cpf` em `employees`;
+  - `ean` em `products`;
+  - `cnpj` em `suppliers`.
+- **Integridade referencial limitada:** Relações entre tabelas careciam de restrições explícitas por meio de `FOREIGN KEY`.
+
+Essa abordagem inicial foi realizada para efeito  de prototipação e análise, mas apresenta limitações de performance e consistência em um ambiente real de produção.
+
+---
+
+#### **Schema Final**
+O schema final introduziu melhorias na estrutura do banco, com foco em:
+
+1. **Consistência dos dados:** Uso de chaves primárias, constraints únicas e relacionamentos bem definidos.
+2. **Performance:** Implementação de índices simples, compostos e únicos para acelerar buscas e garantir integridade.
+3. **Redução de redundâncias:** Eliminação de duplicidade de dados e garantia de normalização com o uso de referências fortes.
+
+---
+
+#### **Principais Alterações Realizadas**
+| **Tabela**          | **Alterações Implementadas**                                                                                       |
+|----------------------|-------------------------------------------------------------------------------------------------------------------|
+| **`categories`**     | - Definição de `id` como `PRIMARY KEY`. <br> - Coluna `code` agora é `UNIQUE` para evitar duplicidade.            |
+| **`employees`**      | - Definição de `id` como `PRIMARY KEY`. <br> - `cpf` marcado como `UNIQUE` para garantir unicidade.               |
+| **`locations`**      | - Definição de `id` como `PRIMARY KEY`.                                                                          |
+| **`products`**       | - Adição de chaves estrangeiras (`FOREIGN KEY`) para `primary_id` e `secondary_id`. <br> - `ean` marcado como `UNIQUE`. |
+| **`suppliers`**      | - `id` definido como `PRIMARY KEY`. <br> - Colunas críticas como `cnpj`, `code` e `location_id` agora são `UNIQUE`. <br> - Adição de `FOREIGN KEY` para `location_id`. |
+| **`purchase_orders`**| - `supplier_id` e `product_id` agora possuem chaves estrangeiras (`FOREIGN KEY`).                                |
+| **`items`**          | - `purchase_order_id` agora vinculado com `FOREIGN KEY`.                                                        |
+| **`places`**         | - `location_id` agora possui uma chave estrangeira (`FOREIGN KEY`). <br> - `cnpj` marcado como `UNIQUE`.        |
+| **`configurations`** | - Definição de um índice composto `UNIQUE (place_id, product_id)` para evitar duplicidade de configuração.        |
+| **`transactions`**   | - Adição de chaves estrangeiras (`FOREIGN KEY`) para `item_id`, `place_id` e `employee_id`.                      |
+
+---
+
+#### **Resultados Obtidos**
+- **Garantia de Consistência:**
+  - Constraints únicos garantem que entidades não sejam duplicadas e fujam do requisito inicial, como CPFs, CNPJs e códigos de produtos.
+- **Conformidade com Boas Práticas:**
+  - Chaves primárias e estrangeiras assegurando a integridade referencial entre tabelas.
+  - Normalização reduzindo redundâncias e favorecendo a organização dos dados.
+- **Escalabilidade:**
+  - A estrutura otimizada do schema suporta crescimento do banco de dados com maior eficiência sem trazer uma perda linear na performance das consultas com base no crescimento dos dados.
+- **Performance Melhorada:**
+  - A implementação de índices acelera as consultas, principalmente em tabelas com **grandes volumes de dados**. (*)
+---
