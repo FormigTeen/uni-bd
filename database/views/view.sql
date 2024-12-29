@@ -57,3 +57,62 @@ ORDER BY
                 ELSE 0
             END
     ) DESC;
+
+
+CREATE VIEW most_sold_products AS
+WITH latest_transactions AS (
+    SELECT
+        t.item_id,
+        MAX(t.executed_at) AS last_executed_at
+    FROM
+        transactions t
+    GROUP BY
+        t.item_id
+),
+sold_items AS (
+    SELECT
+        i.id AS item_id,
+        i.purchase_order_id,
+        t.place_id AS sold_place_id,
+        t.executed_at
+    FROM
+        items i
+    JOIN
+        transactions t
+        ON i.id = t.item_id
+    JOIN
+        latest_transactions lt
+        ON t.item_id = lt.item_id 
+        AND t.executed_at = lt.last_executed_at
+    WHERE
+        i.status = 1
+),
+sold_products AS (
+    SELECT
+        po.product_id,
+        si.sold_place_id,
+        COUNT(*) AS total_sold
+    FROM
+        sold_items si
+    JOIN
+        purchase_orders po
+        ON si.purchase_order_id = po.id
+    GROUP BY
+        po.product_id, si.sold_place_id
+)
+SELECT
+    p.id AS product_id,
+    p.name AS product_name,
+    pl.id AS place_id,
+    pl.name AS place_name,
+    sp.total_sold
+FROM
+    sold_products sp
+JOIN
+    products p
+    ON sp.product_id = p.id
+JOIN
+    places pl
+    ON sp.sold_place_id = pl.id
+ORDER BY
+    sp.total_sold DESC, pl.name, p.name;

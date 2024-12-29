@@ -281,3 +281,22 @@ Os dados agregados podem ser consultados diretamente na [planilha disponibilizad
 ---
 
 - **Queries com piora menor que 0,01ms:** Apesar de estarem marcadas como "Piora", as diferenças são insignificantes para o uso em produção.
+
+
+### View Tables
+
+Foram criadas duas View Tables para simplificar o gerenciamento de estoque e vendas, para análise e a tomada de decisão. Segue as descrições das views:
+
+---
+
+#### **1. `pending_transactions`**
+
+Essa View Table tem como objetivo identificar necessidades de ajuste de estoque em diferentes locais, considerando os limites mínimo e máximo configurados para cada produto. Ela calcula o estoque atual de cada produto por local e sugere ajustes, seja para suprir déficits de estoque ou redistribuir excessos. Essa view será útil para planejar futuras transações de entrada ou saída de produtos e manter o equilíbrio de estoque considerando as configurações registradas.
+
+---
+
+#### **2. `most_sold_products`**
+
+Essa View Table foca na análise de vendas, listando os produtos mais vendidos em cada local. Ela agrupa as informações com base nos itens marcados como vendidos e considera o local final de venda com base nas transações mais recentes. Essa visão é uma ferramenta para identificar padrões de consumo por local, apoiar decisões sobre reposição de estoque e definir estratégias de vendas.
+
+---
