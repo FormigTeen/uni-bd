@@ -1,7 +1,8 @@
-CREATE VIEW pending_transactions AS
+CREATE MATERIALIZED VIEW mv_pending_transactions AS
 WITH latest_transactions AS (
     SELECT
-        t.item_id, MAX(t.executed_at) AS last_executed_at
+        t.item_id,
+        MAX(t.executed_at) AS last_executed_at
     FROM
         transactions t
     GROUP BY
@@ -23,43 +24,42 @@ item_status AS (
     WHERE
         i.status = 0
 )
-SELECT 
-    p.name AS product_name, 
-    pl.name AS place_name, 
-    c.min_quantity, 
-    c.max_quantity, 
+SELECT
+    p.name AS product_name,
+    pl.name AS place_name,
+    c.min_quantity,
+    c.max_quantity,
     COUNT(i.item_id) AS current_quantity,
     CASE
         WHEN COUNT(i.item_id) < c.min_quantity THEN c.min_quantity - COUNT(i.item_id)
         WHEN COUNT(i.item_id) > c.max_quantity THEN COUNT(i.item_id) - c.max_quantity
         ELSE 0
     END AS adjust_quantity
-FROM 
+FROM
     configurations c
-JOIN 
-    products p 
+JOIN
+    products p
     ON c.product_id = p.id
-JOIN 
-    places pl 
+JOIN
+    places pl
     ON c.place_id = pl.id
-LEFT JOIN 
-    item_status i 
+LEFT JOIN
+    item_status i
     ON i.place_id = c.place_id
-WHERE 
+WHERE
     c.min_quantity IS NOT NULL
-GROUP BY 
+GROUP BY
     p.name, pl.name, c.min_quantity, c.max_quantity
-ORDER BY 
+ORDER BY
     ABS(
-            CASE
-                WHEN COUNT(i.item_id) < c.min_quantity THEN c.min_quantity - COUNT(i.item_id)
-                WHEN COUNT(i.item_id) > c.max_quantity THEN COUNT(i.item_id) - c.max_quantity
-                ELSE 0
-            END
+        CASE
+            WHEN COUNT(i.item_id) < c.min_quantity THEN c.min_quantity - COUNT(i.item_id)
+            WHEN COUNT(i.item_id) > c.max_quantity THEN COUNT(i.item_id) - c.max_quantity
+            ELSE 0
+        END
     ) DESC;
 
-
-CREATE VIEW most_sold_products AS
+CREATE MATERIALIZED VIEW mv_most_sold_products AS
 WITH latest_transactions AS (
     SELECT
         t.item_id,
@@ -82,7 +82,7 @@ sold_items AS (
         ON i.id = t.item_id
     JOIN
         latest_transactions lt
-        ON t.item_id = lt.item_id 
+        ON t.item_id = lt.item_id
         AND t.executed_at = lt.last_executed_at
     WHERE
         i.status = 1
