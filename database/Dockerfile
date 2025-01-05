@@ -15,3 +15,4 @@ RUN if [ "$IS_BAD_DATABASE" = "1" ]; then \
 
 COPY ./seeds/seed.sql /docker-entrypoint-initdb.d/02-seed.sql
 COPY ./views/view.sql /docker-entrypoint-initdb.d/03-view.sql
+COPY ./procedures/procedure.sql /docker-entrypoint-initdb.d/04-procedure.sql
