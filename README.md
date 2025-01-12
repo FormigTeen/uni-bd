@@ -300,3 +300,118 @@ Essa View Table tem como objetivo identificar necessidades de ajuste de estoque 
 Essa View Table foca na análise de vendas, listando os produtos mais vendidos em cada local. Ela agrupa as informações com base nos itens marcados como vendidos e considera o local final de venda com base nas transações mais recentes. Essa visão é uma ferramenta para identificar padrões de consumo por local, apoiar decisões sobre reposição de estoque e definir estratégias de vendas.
 
 ---
+
+### Procedures
+
+As **procedures** descritas abaixo foram desenvolvidas, abrangendo operações de atualização, geração de itens, e movimentação de produtos entre locais.
+
+---
+
+#### 1. Atualização de Views Materializadas
+
+Essa procedure atualiza todas as materialized views existentes no banco de dados. É útil para manter as views sincronizadas com os dados mais recentes sem a necessidade de atualizá-las manualmente.
+
+---
+
+#### 2. Geração de Itens para uma Ordem de Compra
+
+Essa procedure é responsável por gerar itens individuais associados a uma ordem de compra, respeitando os limites estabelecidos pela quantidade da ordem. Além disso, ela registra as transações iniciais desses itens para o local especificado.
+
+---
+
+#### 3. Movimentação de Produtos
+
+Essa procedure movimenta produtos de um local de origem para um local de destino, registrando cada transação. Ela também verifica a disponibilidade de itens no local de origem antes de realizar a movimentação.
+
+---
+
+### Instrução de Uso
+
+Esta seção descreve o passo a passo para inicializar o projeto e utilizar seus recursos, tanto no banco de dados quanto na CLI em Python. 
+
+---
+
+#### Requisitos Necessários
+
+Certifique-se de que sua máquina possui os seguintes recursos instalados:
+
+1. **Python 3.8+** - Para executar a CLI do projeto.
+2. **Podman** - Para gerenciar containers.
+3. **Make** - Para facilitar a inicialização do banco de dados.
+
+---
+
+#### Inicialização do Banco de Dados
+A pasta `database` contém os arquivos referentes ao banco de dados e um arquivo `Makefile` que automatiza as etapas de build e inicialização.
+
+1. **Navegue para a pasta do banco de dados:**
+   ```bash
+   cd database
+   ```
+
+2. **Construa a imagem do banco de dados:**
+   ```bash
+   make build
+   ```
+
+3. **Inicie o container do banco de dados:**
+   ```bash
+   make start
+   ```
+   Isso iniciará o container com a configuração padrão.
+
+4. **(Nota) Caso deseje inicializar a versão do Schema não otimizado para testes, basta executar o seguinte comando:**
+   ```bash
+   make start_bad
+   ```
+
+5. **Conecte-se ao banco de dados via CLI (opcional):**
+   Caso necessite realizar interações diretas ou testes no PostgreSQL, utilize o comando abaixo:
+   ```bash
+   make connect
+   ```
+
+---
+
+#### Configuração e Execução da CLI
+A CLI do projeto está localizada na pasta `app`. 
+
+Foi construída a CLI para automatizar a execução das Queries de Tuning.
+
+Siga os passos abaixo para configurá-la:
+
+1. **Navegue para a pasta da CLI:**
+   ```bash
+   cd app
+   ```
+
+2. **Instale as dependências do projeto:**
+   Certifique-se de que o Python está instalado e execute o comando:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Execute a CLI:**
+   Para iniciar a interface de linha de comando, rode:
+   ```bash
+   python main.py
+   ```
+
+> **Nota:** A CLI depende do banco de dados estar em execução. Certifique-se de que o container do banco foi iniciado com sucesso antes de executar este comando.
+
+---
+
+#### Destaque para o Uso Direto do Banco
+Caso deseje realizar interações diretas com o banco de dados, o acesso é facilitado com o comando `make connect` dentro da pasta `database`. Isso abrirá o terminal do PostgreSQL, permitindo comandos SQL diretos.
+
+Exemplo de conexão:
+```bash
+make connect
+```
+
+No prompt do PostgreSQL, é possível executar comandos como:
+```sql
+SELECT * FROM items;
+```
+
+---

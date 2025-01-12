@@ -46,3 +46,36 @@ BEGIN
 END $$;
 
 COMMIT;
+
+### Transactions
+
+As **transações** descritas abaixo foram criadas para executar operações relacionadas ao gerenciamento de pedidos de compra, movimentação de itens e atualizações no estoque.
+
+---
+
+#### 1. Confirmação de Venda (`confirm_sold.sql`)
+
+Essa transação executa as seguintes etapas:
+
+1. Seleciona um fornecedor aleatório. ( Com a finalidade para exemplificação )
+2. Cria uma nova ordem de compra para um produto aleatório, atribuindo uma quantidade e preço gerados aleatoriamente. ( Com a finalidade para exemplificação )
+3. Gera itens associados a essa ordem de compra, cada um com um código RFID único.
+4. Registra a movimentação inicial dos itens para um local aleatório. ( Com a finalidade para exemplificação )
+5. Exibe uma mensagem de confirmação com os detalhes da ordem de compra, fornecedor e local.
+
+---
+
+#### 2. Transferência de Itens (`transfer_item.sql`)
+
+Essa transação executa as seguintes etapas:
+
+1. Seleciona um local de origem e um local de destino, garantindo que sejam diferentes.
+2. Determina aleatoriamente a quantidade de itens a serem transferidos. ( Com a finalidade para exemplificação )
+3. Seleciona itens disponíveis no local de origem, baseando-se nos itens mais recentes.
+4. Registra a saída dos itens do local de origem e a entrada no local de destino.
+5. Exibe uma mensagem de confirmação com os detalhes da transferência realizada.
+
+---
+
+Essas transações são projetadas para manter a rastreabilidade e integridade dos dados durante as operações no sistema. Elas utilizam elementos aleatórios para simular cenários realistas de movimentação e gerenciamento de estoque.
+
